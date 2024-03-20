@@ -161,3 +161,27 @@ $ echo  "00:cc:97:48:16:86:2e:d7:c2:cc:06:a2:64:69:12:f6:8c:9b:ff:6d:46:df:71:b4
 ```
 
 Easy. Now let's just put this into `hkelectric_asn1.cnf` (see file in same folder).
+
+Now, let's convert this ASN1 config file into the DER public key:
+
+```
+$ openssl asn1parse -genconf hkelectric_asn1.cnf -noout -out hkelectric.der
+```
+
+Finally, we can convert the DER key to PEM to make it pretty:
+
+```
+$ openssl rsa -pubin -in hkelectric.der 
+writing RSA key
+-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAzJdIFoYu18LMBqJkaRL2
+jJv/bUbfcbS6UFYwnsa8F6tKi7/Ai71OUlNZJLZPtjApXjbvd98Af4XEPjADqyDS
+LROoNyNTwqbVE8vcsSYbX5np+AyjhmlXSTDp10Kaf4uiVYr6DP/Q/CC4xtUc3vbs
+hQCVTxbxX2e1PEQAb7jXyFKbpjNK5GI25mYxyUQE/PI6O2KZusn3+ToZbyQsRoeE
+57PrQUdBVgEC/V6gLqjqK0jRX81TEfXgwT+AF/+cPbokmEa+C3V09EU43a9Z7XP4
+CloQKtXdQH/GtXwVjsmeXqBa2Zb3qVBy8WXDzofOImMi2e38NJafE4Oends3ijNR
+1QIDAQAB
+-----END PUBLIC KEY-----
+```
+
+Now we can use this guy with more standard crypto libraries! _Note: We could've used the DER format just as easily, the PEM is just a bit nicer to copy paste around since its ASCII._
