@@ -123,3 +123,41 @@ var rsa_key = {
 ```
 
 This is in modulus and exponent form, let's convert it to a standard PEM form for maximum compatibility.
+
+The ASN1 conf for an RSA public key looks something like this:
+
+Source https://www.openssl.org/docs/man3.2/man3/ASN1_generate_nconf.html
+
+```
+# Start with a SEQUENCE
+asn1=SEQUENCE:pubkeyinfo
+
+# pubkeyinfo contains an algorithm identifier and the public key wrapped
+# in a BIT STRING
+[pubkeyinfo]
+algorithm=SEQUENCE:rsa_alg
+pubkey=BITWRAP,SEQUENCE:rsapubkey
+
+# algorithm ID for RSA is just an OID and a NULL
+[rsa_alg]
+algorithm=OID:rsaEncryption
+parameter=NULL
+
+# Actual public key: modulus and exponent
+[rsapubkey]
+n=INTEGER:0xBB6FE79432CC6EA2D8F970675A5A87BFBE1AFF0BE63E879F2AFFB93644\
+D4D2C6D000430DEC66ABF47829E74B8C5108623A1C0EE8BE217B3AD8D36D5EB4FCA1D9
+
+e=INTEGER:0x010001
+```
+
+The public exponent `65537` is `0x010001` in hex, so the example has us covered there.
+
+For the modulus, we can use the value from the JS snippet and get the hex string using `sed`:
+
+```
+$ echo  "00:cc:97:48:16:86:2e:d7:c2:cc:06:a2:64:69:12:f6:8c:9b:ff:6d:46:df:71:b4:ba:50:56:30:9e:c6:bc:17:ab:4a:8b:bf:c0:8b:bd:4e:52:53:59:24:b6:4f:b6:30:29:5e:36:ef:77:df:00:7f:85:c4:3e:30:03:ab:20:d2:2d:13:a8:37:23:53:c2:a6:d5:13:cb:dc:b1:26:1b:5f:99:e9:f8:0c:a3:86:69:57:49:30:e9:d7:42:9a:7f:8b:a2:55:8a:fa:0c:ff:d0:fc:20:b8:c6:d5:1c:de:f6:ec:85:00:95:4f:16:f1:5f:67:b5:3c:44:00:6f:b8:d7:c8:52:9b:a6:33:4a:e4:62:36:e6:66:31:c9:44:04:fc:f2:3a:3b:62:99:ba:c9:f7:f9:3a:19:6f:24:2c:46:87:84:e7:b3:eb:41:47:41:56:01:02:fd:5e:a0:2e:a8:ea:2b:48:d1:5f:cd:53:11:f5:e0:c1:3f:80:17:ff:9c:3d:ba:24:98:46:be:0b:75:74:f4:45:38:dd:af:59:ed:73:f8:0a:5a:10:2a:d5:dd:40:7f:c6:b5:7c:15:8e:c9:9e:5e:a0:5a:d9:96:f7:a9:50:72:f1:65:c3:ce:87:ce:22:63:22:d9:ed:fc:34:96:9f:13:83:9e:9d:db:37:8a:33:51:d5" | sed 's/://g'
+00cc974816862ed7c2cc06a2646912f68c9bff6d46df71b4ba5056309ec6bc17ab4a8bbfc08bbd4e52535924b64fb630295e36ef77df007f85c43e3003ab20d22d13a8372353c2a6d513cbdcb1261b5f99e9f80ca38669574930e9d7429a7f8ba2558afa0cffd0fc20b8c6d51cdef6ec8500954f16f15f67b53c44006fb8d7c8529ba6334ae46236e66631c94404fcf23a3b6299bac9f7f93a196f242c468784e7b3eb414741560102fd5ea02ea8ea2b48d15fcd5311f5e0c13f8017ff9c3dba249846be0b7574f44538ddaf59ed73f80a5a102ad5dd407fc6b57c158ec99e5ea05ad996f7a95072f165c3ce87ce226322d9edfc34969f13839e9ddb378a3351d5
+```
+
+Easy. Now let's just put this into `hkelectric_asn1.cnf` (see file in same folder).
