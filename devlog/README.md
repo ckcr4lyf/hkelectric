@@ -185,3 +185,11 @@ CloQKtXdQH/GtXwVjsmeXqBa2Zb3qVBy8WXDzofOImMi2e38NJafE4Oends3ijNR
 ```
 
 Now we can use this guy with more standard crypto libraries! _Note: We could've used the DER format just as easily, the PEM is just a bit nicer to copy paste around since its ASCII._
+
+### Authenticating
+
+Now that we have the RSA public key, we can prepare the plaintext payload, encrypt it and prepare a JWE, and submit it to HKElectric
+
+On doing so, we get two cookies in the response (i.e. `Set-Cookie` header). These are what we need to authenticate subsequent API calls.
+
+You'd think if they went to the trouble of using JWE on all requests, at least they could use something like JWT for the auth on subsequent requests, but no. But I digress.
