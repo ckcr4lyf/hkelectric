@@ -193,3 +193,34 @@ Now that we have the RSA public key, we can prepare the plaintext payload, encry
 On doing so, we get two cookies in the response (i.e. `Set-Cookie` header). These are what we need to authenticate subsequent API calls.
 
 You'd think if they went to the trouble of using JWE on all requests, at least they could use something like JWT for the auth on subsequent requests, but no. But I digress.
+
+## Data
+
+Now that we're authenticated, let's look at the meat: grabbing data from their API!
+
+I am mostly interested in the half-hourly load profile - the annoyance of the clicking and slow loading and manual operations needed was the main reason for all this RE in the first place.
+
+### Half hourly load profile
+
+Again, with our breakpoint at the HTTP interceptor, we try and request the load profile of a day, so we can see what the plaintext request is:
+
+![Breakpoint 2](./breakpoint_2.png)
+
+Seems straightforward enough.
+
+However this only generates an async job on HKElectric's side, as indicated by the response:
+
+```json
+{
+    "TicketID": "ASYNC-BEDC6C1A-AAAA-BBBB-CCCC-REDACTED",
+    "StateInfo": {
+        "Result": "SUCCESS",
+        "ErrorCode": "",
+        "NextState": ""
+    }
+}
+```
+
+To actually get the data, there is a second request. Figuring out the contents of this is left as an exercise for the reader. (Or you know, you could just look at the source.)
+
+With these two guys, we can now automate retrieval of half-hourly load profiles for all the days!
