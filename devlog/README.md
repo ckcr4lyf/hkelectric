@@ -224,3 +224,9 @@ However this only generates an async job on HKElectric's side, as indicated by t
 To actually get the data, there is a second request. Figuring out the contents of this is left as an exercise for the reader. (Or you know, you could just look at the source.)
 
 With these two guys, we can now automate retrieval of half-hourly load profiles for all the days!
+
+### Trying to get data
+
+After successful login, if we try and just make a basic request to get the half hourly load profile, it doesn't seem to work.
+
+It seems we need to also get some param called the `RequestVerificationToken`.

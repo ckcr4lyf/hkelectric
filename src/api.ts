@@ -52,5 +52,43 @@ export class HKElectricApi {
 
         // Hacky cookie manipulation but it works
         this.cookie = rsp.headers.getSetCookie().map(cookie => cookie.split(';')[0]).join('; ');
+        console.log(`Got cookie as: ${this.cookie}`);
+    }
+
+    async getHalfHourlyLoadProfileTicket(date: string): Promise<string>  {
+        const plaintextReq = {
+            ContractAccountNumber: this.username,
+            RecordTimeBand: date,
+            DailyDateFrom: '',
+            DailyDateTo: '',
+            QueryDataType: 'Consumption',
+        };
+
+        const jwe = await new jose.CompactEncrypt(Buffer.from(JSON.stringify(plaintextReq))).setProtectedHeader({
+            alg: 'RSA-OAEP-256',
+            enc: 'A256GCM'
+        }).encrypt(rsaPublicKey);
+
+        const rsp = await fetch('https://aol.hkelectric.com/AOL/api/LoadProfile/GetHalfHourlyLoadProfileQueryTicket', {
+            method: 'POST',
+            body: JSON.stringify({
+                EncryptedData: jwe,
+            }),
+            headers: {
+                'Cookie': this.cookie,
+            }
+        });
+
+        // YOLO
+        const response: any = await rsp.json();
+
+        if (response.StateInfo.Result !== 'SUCCESS'){
+            // TODO: Better handling here.
+            console.log(`something fucked up here.`);
+            process.exit(1);
+        }
+
+        console.log(response.TicketID);
+        return response.TicketID;
     }
 }
